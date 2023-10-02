@@ -1,0 +1,41 @@
+export enum roles {
+  SA = 'SA',
+  CONTENT_ADMIN = 'CONTENT_ADMIN',
+  ADMINISTRATIVE = 'ADMINISTRATIVE',
+  PROFESSIONAL = 'PROFESSIONAL',
+  TECHNICIAN = 'TECHNICIAN',
+  DIRECTIVE = 'DIRECTIVE',
+  PATIENT = 'PATIENT',
+}
+
+export enum userRoles {
+  ADMINISTRATIVE = 'ADMINISTRATIVE',
+  PROFESSIONAL = 'PROFESSIONAL',
+  TECHNICIAN = 'TECHNICIAN',
+  DIRECTIVE = 'DIRECTIVE',
+  PATIENT = 'PATIENT',
+}
+
+export enum userStatus {
+  ACTIVATION_PENDING = 'ACTIVATION_PENDING',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  CLOSED = 'CLOSED',
+}
+
+export enum companyStatus {
+  ACTIVATION_PENDING = 'ACTIVATION_PENDING',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  CLOSED = 'CLOSED',
+}
+
+export enum companyTypes {
+  PRIVATE = 'PRIVATE',
+  PUBLIC = 'PUBLIC',
+  MIXT = 'MIXT',
+}
+
+export enum tributaryTypes {
+  CUIT = 'CUIT',
+}
