@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+    camba-db:
+        container_name: camba-db
+        image: mongo:latest
+        volumes:
+            - mongo:/data/db
+        ports:
+            - '27017:27017'
+        restart: always
+    camba-auth:
+        container_name: camba-auth
+        build: ./camba-auth
+        ports:
+            - '5001:5001'
+        volumes:
+            - ./camba-auth:/app
+            - /app/node_modules
+        env_file:
+            - ./camba-auth/.env.development
+        depends_on:
+            - camba-db
+        restart: always
+    camba-frontend:
+        container_name: camba-frontend
+        build: ./frontend
+        volumes:
+            - ./frontend:/app
+        ports:
+            - '3000:3000'
+        depends_on:
+            - camba-auth
+        restart: always
+volumes:
+    mongo:
