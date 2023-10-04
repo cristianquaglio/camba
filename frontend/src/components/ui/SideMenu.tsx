@@ -31,7 +31,7 @@ export const SideMenu = () => {
 
     return (
         <Drawer
-            open={false}
+            open={true}
             anchor='right'
             sx={{
                 backdropFilter: 'blur(4px)',

@@ -1,4 +1,4 @@
-import { ClassNames } from '@emotion/react';
+import NextLink from 'next/link';
 import { SearchOutlined } from '@mui/icons-material';
 import {
     AppBar,
@@ -9,7 +9,6 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material';
-import NextLink from 'next/link';
 
 export const NavBar = () => {
     return (

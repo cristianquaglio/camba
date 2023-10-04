@@ -1,5 +1,6 @@
-import Head from 'next/head';
 import React, { FC } from 'react';
+import Head from 'next/head';
+
 import { NavBar } from '../ui/NavBar';
 import { SideMenu } from '../ui/SideMenu';
 
