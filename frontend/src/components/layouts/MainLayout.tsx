@@ -1,5 +1,7 @@
 import Head from 'next/head';
 import React, { FC } from 'react';
+import { NavBar } from '../ui/NavBar';
+import { SideMenu } from '../ui/SideMenu';
 
 interface Props {
     children: React.ReactNode;
@@ -12,8 +14,10 @@ export const MainLayout: FC<Props> = ({ title, children }) => {
             <Head>
                 <title>{title}</title>
             </Head>
-            <nav>{/* TODO: NavBar */}</nav>
-            {/* TODO: Sidemenu */}
+            <nav>
+                <NavBar />
+            </nav>
+            <SideMenu />
             <main
                 style={{
                     margin: '80px auto',
