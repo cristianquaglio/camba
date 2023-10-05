@@ -27,6 +27,7 @@ async function main() {
       },
     }),
   );
+  app.enableCors();
   await app.listen(process.env.APP_PORT || 5001);
   const logger = new Logger('main');
   logger.log(`camba-auth is running on ${await app.getUrl()}`);
