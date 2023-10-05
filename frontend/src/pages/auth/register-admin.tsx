@@ -89,7 +89,7 @@ const RegisterPage = () => {
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant='h1' component='h1'>
-                                Crear cuenta
+                                Crear cuenta admin
                             </Typography>
                             <Chip
                                 label='Usuario existente'
