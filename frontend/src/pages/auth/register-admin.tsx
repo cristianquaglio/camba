@@ -10,6 +10,7 @@ import {
     Box,
     Button,
     Chip,
+    CircularProgress,
     Grid,
     Link,
     TextField,
@@ -38,9 +39,12 @@ const RegisterPage = () => {
         register,
         handleSubmit,
         formState: { errors },
+        reset,
     } = useForm<formData>();
     const [showError, setShowError] = useState(false);
-    const [returnedMessage, setReturnedMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isOk, setIsOk] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const onRegisterForm = async ({
         firstName,
@@ -50,8 +54,7 @@ const RegisterPage = () => {
         password,
         company,
     }: formData) => {
-        setShowError(false);
-
+        setIsLoading(true);
         const { hasError, message } = await registerAdmin(
             firstName,
             lastName,
@@ -60,17 +63,22 @@ const RegisterPage = () => {
             password,
             company,
         );
+        setIsLoading(false);
         if (hasError) {
             setShowError(true);
-            setReturnedMessage(message!);
+            setErrorMessage(message!);
             setTimeout(() => {
                 setShowError(false);
             }, 3000);
         }
-        setReturnedMessage(message!);
-        setTimeout(() => {
-            setReturnedMessage('');
-        }, 3000);
+        if (!hasError) {
+            reset();
+            setIsOk(true);
+            setTimeout(() => {
+                setIsOk(false);
+            }, 6000);
+        }
+
         // await signIn('credentials', { email, password });
     };
 
@@ -96,10 +104,7 @@ const RegisterPage = () => {
                                 icon={<InfoOutlined />}
                                 className='fadeIn'
                                 sx={{
-                                    display:
-                                        returnedMessage.length > 0 && !showError
-                                            ? 'flex'
-                                            : 'none',
+                                    display: isOk ? 'flex' : 'none',
                                 }}
                             />
                         </Grid>
@@ -201,15 +206,19 @@ const RegisterPage = () => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Button
-                                type='submit'
-                                color='secondary'
-                                className='circular-btn'
-                                size='large'
-                                fullWidth
-                            >
-                                Crear cuenta
-                            </Button>
+                            {isLoading ? (
+                                <CircularProgress />
+                            ) : (
+                                <Button
+                                    type='submit'
+                                    color='secondary'
+                                    className='circular-btn'
+                                    size='large'
+                                    fullWidth
+                                >
+                                    Crear cuenta
+                                </Button>
+                            )}
                         </Grid>
                         <Grid item xs={12} display='flex' justifyContent='end'>
                             <NextLink
