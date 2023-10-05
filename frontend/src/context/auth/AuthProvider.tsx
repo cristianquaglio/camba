@@ -58,17 +58,29 @@ export const AuthProvider: FC<Props> = ({ children }) => {
         }
     };
 
-    const getCompanies = async (): Promise<any> => {
+    const getCompanies = async (): Promise<
+        | { hasError: boolean; message: string }
+        | { _id: string; shortName: string }[]
+    > => {
         try {
             const { data } = await axios.get<ICompany[]>(
                 `${process.env.NEXT_PUBLIC_API_URL}/companies`,
             );
-            const companies = data.map((c) => {
-                c._id, c.shortName;
+            if (!data) {
+                return {
+                    hasError: true,
+                    message: 'Error trayendo los organismos',
+                };
+            }
+            const companies = data.map(({ _id, shortName }) => {
+                return { _id, shortName };
             });
             return companies;
         } catch (error) {
-            console.log(error);
+            return {
+                hasError: true,
+                message: 'Error trayendo los organismos',
+            };
         }
     };
 

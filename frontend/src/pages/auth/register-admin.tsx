@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
@@ -13,6 +13,7 @@ import {
     CircularProgress,
     Grid,
     Link,
+    MenuItem,
     TextField,
     Typography,
 } from '@mui/material';
@@ -21,6 +22,7 @@ import { ErrorOutline, InfoOutlined } from '@mui/icons-material';
 import { AuthLayout } from '@/components/layouts';
 import { validations } from '@/utils';
 import { AuthContext } from '@/context/auth';
+import { fetchData } from 'next-auth/client/_utils';
 
 type formData = {
     firstName: string;
@@ -33,18 +35,28 @@ type formData = {
 
 const RegisterPage = () => {
     const router = useRouter();
-    const { registerAdmin } = useContext(AuthContext);
+    const { registerAdmin, getCompanies } = useContext(AuthContext);
 
     const {
         register,
         handleSubmit,
         formState: { errors },
         reset,
+        resetField,
     } = useForm<formData>();
     const [showError, setShowError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [isOk, setIsOk] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [companies, setCompanies] = useState([]);
+    // const [companies, setCompanies] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setCompanies(await getCompanies());
+        };
+        fetchData();
+    }, []);
 
     const onRegisterForm = async ({
         firstName,
@@ -73,6 +85,7 @@ const RegisterPage = () => {
         }
         if (!hasError) {
             reset();
+            resetField('company');
             setIsOk(true);
             setTimeout(() => {
                 setIsOk(false);
@@ -192,8 +205,9 @@ const RegisterPage = () => {
                             <TextField
                                 label='Organismo'
                                 variant='filled'
+                                defaultValue=''
                                 fullWidth
-                                // select
+                                select
                                 {...register('company', {
                                     required: 'Este campo es requerido',
                                     minLength: {
@@ -203,7 +217,13 @@ const RegisterPage = () => {
                                 })}
                                 error={!!errors.company}
                                 helperText={errors.company?.message}
-                            />
+                            >
+                                {companies.map(({ _id, shortName }) => (
+                                    <MenuItem key={_id} value={_id}>
+                                        {shortName}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                         </Grid>
                         <Grid item xs={12}>
                             {isLoading ? (
