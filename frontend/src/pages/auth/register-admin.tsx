@@ -1,10 +1,8 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
-import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
-// import { getSession, signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import {
     Box,
@@ -22,7 +20,6 @@ import { ErrorOutline, InfoOutlined } from '@mui/icons-material';
 import { AuthLayout } from '@/components/layouts';
 import { validations } from '@/utils';
 import { AuthContext } from '@/context/auth';
-import { fetchData } from 'next-auth/client/_utils';
 
 type formData = {
     firstName: string;
@@ -36,7 +33,6 @@ type formData = {
 const RegisterPage = () => {
     const router = useRouter();
     const { registerAdmin, getCompanies } = useContext(AuthContext);
-
     const {
         register,
         handleSubmit,
@@ -49,7 +45,6 @@ const RegisterPage = () => {
     const [isOk, setIsOk] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [companies, setCompanies] = useState([]);
-    // const [companies, setCompanies] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -91,8 +86,6 @@ const RegisterPage = () => {
                 setIsOk(false);
             }, 6000);
         }
-
-        // await signIn('credentials', { email, password });
     };
 
     return (
@@ -192,8 +185,12 @@ const RegisterPage = () => {
                                 {...register('password', {
                                     required: 'Este campo es requerido',
                                     minLength: {
-                                        value: 6,
-                                        message: 'Mínimo 6 caracteres',
+                                        value: 8,
+                                        message: 'Mínimo 8 caracteres',
+                                    },
+                                    maxLength: {
+                                        value: 16,
+                                        message: 'Máximo 16 caracteres',
                                     },
                                     validate: validations.isPassword,
                                 })}
@@ -259,27 +256,5 @@ const RegisterPage = () => {
         </AuthLayout>
     );
 };
-
-// export const getServerSideProps: GetServerSideProps = async ({
-//     req,
-//     query,
-// }) => {
-//     const session = await getSession({ req });
-
-//     const { p = '/' } = query;
-
-//     if (session) {
-//         return {
-//             redirect: {
-//                 destination: p.toString(),
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {},
-//     };
-// };
 
 export default RegisterPage;

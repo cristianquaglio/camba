@@ -2,7 +2,7 @@ import { FC, useReducer } from 'react';
 import axios from 'axios';
 
 import { AuthContext, authReducer } from '.';
-import { ICompany } from '../../interfaces/company';
+import { ICompany, IValidationEmailResponse } from '../../interfaces';
 
 export interface AuthState {
     companies: ICompany[];
@@ -84,8 +84,31 @@ export const AuthProvider: FC<Props> = ({ children }) => {
         }
     };
 
+    const validateEmail = async (
+        token: string,
+    ): Promise<IValidationEmailResponse> => {
+        try {
+            const { data } = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/auth/confirm?token=${token}`,
+            );
+            const { statusCode, message } = data;
+            return { statusCode, message };
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                return error.response?.data;
+            }
+            return {
+                error: 'Unknown Error',
+                statusCode: 500,
+                message: 'Error validando el email',
+            };
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ ...state, registerAdmin, getCompanies }}>
+        <AuthContext.Provider
+            value={{ ...state, registerAdmin, getCompanies, validateEmail }}
+        >
             {children}
         </AuthContext.Provider>
     );

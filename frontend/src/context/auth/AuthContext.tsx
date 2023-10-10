@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { ICompany } from '../../interfaces/company';
+import { ICompany, IValidationEmailResponse } from '../../interfaces';
 
 interface ContextProps {
     companies: ICompany[];
@@ -12,6 +12,7 @@ interface ContextProps {
         company: string,
     ) => Promise<{ hasError: boolean; message?: string | undefined }>;
     getCompanies: () => Promise<any>;
+    validateEmail: (token: string) => Promise<IValidationEmailResponse>;
 }
 
 export const AuthContext = createContext({} as ContextProps);
