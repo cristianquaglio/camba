@@ -80,11 +80,11 @@ const RegisterPage = () => {
         }
         if (!hasError) {
             reset();
-            resetField('company');
             setIsOk(true);
             setTimeout(() => {
                 setIsOk(false);
-            }, 6000);
+                router.push('/auth/login');
+            }, 3000);
         }
     };
 

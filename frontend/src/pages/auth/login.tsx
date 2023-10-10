@@ -47,6 +47,7 @@ const LoginPage = () => {
 
         // const destination = router.query.p?.toString() || '/';
         // router.replace(destination);
+        console.log({ email, password });
     };
 
     return (
