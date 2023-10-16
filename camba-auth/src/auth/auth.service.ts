@@ -43,7 +43,7 @@ export class AuthService {
       );
     const tokens = await this.generateUserTokens(user);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
-    return tokens;
+    return { tokens, user };
   }
 
   async validateUser(email: string, password: string): Promise<IUserPayload> {
