@@ -31,7 +31,7 @@ export const RegisterPage = () => {
         (state: RootState) => state.auth,
     );
 
-    const [message, setMessage] = useState(false);
+    const [showLegend, setShowLegend] = useState(false);
 
     type formData = {
         firstName: string;
@@ -53,6 +53,10 @@ export const RegisterPage = () => {
         dispatch(getCompanies());
     }, [dispatch]);
 
+    useEffect(() => {
+        if (isRegistered) reset();
+    }, [isRegistered]);
+
     const onRegister = async ({
         firstName,
         lastName,
@@ -61,7 +65,7 @@ export const RegisterPage = () => {
         password,
         company,
     }: formData) => {
-        setMessage(false);
+        setShowLegend(false);
         dispatch(
             registerAdmin({
                 firstName,
@@ -72,13 +76,10 @@ export const RegisterPage = () => {
                 company,
             }),
         );
-        setMessage(true);
-        if (isRegistered || hasError) {
-            setTimeout(() => {
-                setMessage(false);
-            }, 6000);
-        }
-        if (isRegistered) reset();
+        setShowLegend(true);
+        setTimeout(() => {
+            setShowLegend(false);
+        }, 6000);
     };
 
     return (
@@ -90,34 +91,42 @@ export const RegisterPage = () => {
                             <Typography variant='h1' component='h1'>
                                 Registrar usuario
                             </Typography>
-                            {hasError ? (
-                                <Chip
-                                    label='Usuario duplicado'
-                                    color='error'
-                                    icon={<ErrorOutline />}
-                                    className='fadeIn'
-                                    sx={{ display: message ? 'flex' : 'none' }}
-                                />
-                            ) : (
+                            {showLegend && (
                                 <>
                                     <Chip
-                                        label='Usuario registrado correctamente'
-                                        color='success'
-                                        icon={<InfoOutlined />}
+                                        label='Usuario duplicado'
+                                        color='error'
+                                        icon={<ErrorOutline />}
                                         className='fadeIn'
                                         sx={{
-                                            display: message ? 'flex' : 'none', mb: 1
+                                            display: hasError ? 'flex' : 'none',
                                         }}
                                     />
-                                    <Chip
-                                        label='Revise su correo para validar su cuenta'
-                                        color='success'
-                                        icon={<InfoOutlined />}
-                                        className='fadeIn'
-                                        sx={{
-                                            display: message ? 'flex' : 'none',
-                                        }}
-                                    />
+                                    <>
+                                        <Chip
+                                            label='Usuario registrado correctamente'
+                                            color='success'
+                                            icon={<InfoOutlined />}
+                                            className='fadeIn'
+                                            sx={{
+                                                display: isRegistered
+                                                    ? 'flex'
+                                                    : 'none',
+                                                mb: 1,
+                                            }}
+                                        />
+                                        <Chip
+                                            label='Revise su correo para validar su cuenta'
+                                            color='success'
+                                            icon={<InfoOutlined />}
+                                            className='fadeIn'
+                                            sx={{
+                                                display: isRegistered
+                                                    ? 'flex'
+                                                    : 'none',
+                                            }}
+                                        />
+                                    </>
                                 </>
                             )}
                         </Grid>
@@ -195,6 +204,7 @@ export const RegisterPage = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                id='company'
                                 label='Organismo'
                                 variant='filled'
                                 defaultValue=''

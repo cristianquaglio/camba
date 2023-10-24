@@ -31,8 +31,11 @@ export const login = createAsyncThunk(
         try {
             const { tokens, user } = await AuthService.login(email, password);
             const { token, refreshToken } = tokens;
-            Cookies.set('token', token);
-            Cookies.set('refresh-token', refreshToken);
+            Cookies.set('token', token, { secure: true, sameSite: 'None' });
+            Cookies.set('refresh-token', refreshToken, {
+                secure: true,
+                sameSite: 'None',
+            });
             return { token, refreshToken, user };
         } catch (error: any) {
             const message =

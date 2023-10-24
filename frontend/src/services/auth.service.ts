@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { ICompany } from '../interfaces/user.interface';
 
-const AUTH_URI = 'http://camba-auth:5001/auth';
+const AUTH_URI = 'http://localhost:5001/auth';
 
-const APP_URI = 'http://camba-auth:5001';
+const APP_URI = 'http://localhost:5001';
 
 const login = async (email: string, password: string) => {
     const { data } = await axios.post(`${AUTH_URI}/login`, { email, password });
