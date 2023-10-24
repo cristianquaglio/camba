@@ -1,43 +1,45 @@
-import NextLink from 'next/link';
-import { SearchOutlined } from '@mui/icons-material';
+import { FC } from 'react';
 import {
     AppBar,
     Box,
     Button,
     IconButton,
-    Link,
     Toolbar,
     Typography,
 } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
-export const NavBar = () => {
+interface Props {
+    title: string;
+}
+
+export const NavBar: FC<Props> = ({ title }) => {
     return (
-        <AppBar>
-            <Toolbar>
-                <NextLink href='/' passHref legacyBehavior>
-                    <Link
-                        display='flex'
-                        alignItems='center'
-                        sx={{ textDecoration: 'none' }}
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar position='static'>
+                <Toolbar>
+                    <IconButton
+                        size='large'
+                        edge='start'
+                        color='inherit'
+                        aria-label='menu'
+                        sx={{ mr: 2 }}
                     >
-                        <Typography>Camba |</Typography>
-                        <Typography sx={{ ml: 0.5 }}>v0.1</Typography>
-                    </Link>
-                </NextLink>
-                <Box sx={{ flex: 1 }} />
-                {/* pantallas grandes */}
-                <IconButton
-                    sx={{ display: { xs: 'none', sm: 'flex' } }}
-                    className='fadeIn'
-                >
-                    <SearchOutlined />
-                </IconButton>
-                {/* pantallas pequeñas */}
-                <IconButton sx={{ display: { xs: 'flex', sm: 'none' } }}>
-                    <SearchOutlined />
-                </IconButton>
-                <Button>Menú</Button>
-            </Toolbar>
-        </AppBar>
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography
+                        variant='h6'
+                        component='div'
+                        sx={{ flexGrow: 1 }}
+                    >
+                        {title}
+                    </Typography>
+                    <Button color='secondary'>
+                        <AccountCircleOutlinedIcon />
+                    </Button>
+                </Toolbar>
+            </AppBar>
+        </Box>
     );
 };

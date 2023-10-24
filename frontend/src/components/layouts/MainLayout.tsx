@@ -1,24 +1,19 @@
 import React, { FC } from 'react';
-import Head from 'next/head';
 
-import { NavBar } from '../ui/NavBar';
-import { SideMenu } from '../ui/SideMenu';
+import { NavBar } from '../ui';
 
 interface Props {
     children: React.ReactNode;
     title: string;
 }
 
-export const MainLayout: FC<Props> = ({ title, children }) => {
+export const MainLayout: FC<Props> = ({ children, title }) => {
     return (
         <>
-            <Head>
-                <title>{title}</title>
-            </Head>
             <nav>
-                <NavBar />
+                <NavBar title={title} />
             </nav>
-            <SideMenu />
+            {/* SideMenu */}
             <main
                 style={{
                     margin: '80px auto',
@@ -28,7 +23,7 @@ export const MainLayout: FC<Props> = ({ title, children }) => {
             >
                 {children}
             </main>
-            <footer>{/* TODO: Footer */}</footer>
+            <footer>{/* Footer */}</footer>
         </>
     );
 };

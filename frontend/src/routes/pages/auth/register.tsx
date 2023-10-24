@@ -1,59 +1,59 @@
-'use client';
-
-import { useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import NextLink from 'next/link';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import {
     Box,
     Button,
     Chip,
-    CircularProgress,
     Grid,
     Link,
     MenuItem,
     TextField,
     Typography,
 } from '@mui/material';
-import { ErrorOutline, InfoOutlined } from '@mui/icons-material';
+import {
+    CircleOutlined,
+    ErrorOutline,
+    InfoOutlined,
+} from '@mui/icons-material';
+import { useForm } from 'react-hook-form';
 
-import { AuthLayout } from '@/components/layouts';
-import { validations } from '@/utils';
-import { AuthContext } from '@/context/auth';
+import { AuthLayout } from '../../../components/layouts';
+import { validators } from '../../../utils';
+import { getCompanies, registerAdmin } from '../../../slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../../store/store';
 
-type formData = {
-    firstName: string;
-    lastName: string;
-    username: string;
-    email: string;
-    password: string;
-    company: string;
-};
+export const RegisterPage = () => {
+    const dispatch = useDispatch<AppDispatch>();
 
-const RegisterPage = () => {
-    const router = useRouter();
-    const { registerAdmin, getCompanies } = useContext(AuthContext);
+    const companies = useSelector((state: RootState) => state.auth.companies);
+
+    const { isLoading, isRegistered, hasError } = useSelector(
+        (state: RootState) => state.auth,
+    );
+
+    const [message, setMessage] = useState(false);
+
+    type formData = {
+        firstName: string;
+        lastName: string;
+        username: string;
+        email: string;
+        password: string;
+        company: string;
+    };
+
     const {
         register,
         handleSubmit,
-        formState: { errors },
         reset,
-        resetField,
+        formState: { errors },
     } = useForm<formData>();
-    const [showError, setShowError] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [isOk, setIsOk] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [companies, setCompanies] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            setCompanies(await getCompanies());
-        };
-        fetchData();
-    }, []);
+        dispatch(getCompanies());
+    }, [dispatch]);
 
-    const onRegisterForm = async ({
+    const onRegister = async ({
         firstName,
         lastName,
         username,
@@ -61,58 +61,65 @@ const RegisterPage = () => {
         password,
         company,
     }: formData) => {
-        setIsLoading(true);
-        const { hasError, message } = await registerAdmin(
-            firstName,
-            lastName,
-            username,
-            email,
-            password,
-            company,
+        setMessage(false);
+        dispatch(
+            registerAdmin({
+                firstName,
+                lastName,
+                username,
+                email,
+                password,
+                company,
+            }),
         );
-        setIsLoading(false);
-        if (hasError) {
-            setShowError(true);
-            setErrorMessage(message!);
+        setMessage(true);
+        if (isRegistered || hasError) {
             setTimeout(() => {
-                setShowError(false);
-            }, 3000);
+                setMessage(false);
+            }, 6000);
         }
-        if (!hasError) {
-            reset();
-            setIsOk(true);
-            setTimeout(() => {
-                setIsOk(false);
-                router.push('/auth/login');
-            }, 3000);
-        }
+        if (isRegistered) reset();
     };
 
     return (
-        <AuthLayout title='Crear cuenta admin'>
-            <form onSubmit={handleSubmit(onRegisterForm)} noValidate>
+        <AuthLayout>
+            <form onSubmit={handleSubmit(onRegister)} noValidate>
                 <Box sx={{ width: 350, padding: '10px 20px' }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant='h1' component='h1'>
-                                Crear cuenta admin
+                                Registrar usuario
                             </Typography>
-                            <Chip
-                                label='Usuario existente'
-                                color='error'
-                                icon={<ErrorOutline />}
-                                className='fadeIn'
-                                sx={{ display: showError ? 'flex' : 'none' }}
-                            />
-                            <Chip
-                                label='Usuario creado. Valide su correo electrónico'
-                                color='success'
-                                icon={<InfoOutlined />}
-                                className='fadeIn'
-                                sx={{
-                                    display: isOk ? 'flex' : 'none',
-                                }}
-                            />
+                            {hasError ? (
+                                <Chip
+                                    label='Usuario duplicado'
+                                    color='error'
+                                    icon={<ErrorOutline />}
+                                    className='fadeIn'
+                                    sx={{ display: message ? 'flex' : 'none' }}
+                                />
+                            ) : (
+                                <>
+                                    <Chip
+                                        label='Usuario registrado correctamente'
+                                        color='success'
+                                        icon={<InfoOutlined />}
+                                        className='fadeIn'
+                                        sx={{
+                                            display: message ? 'flex' : 'none', mb: 1
+                                        }}
+                                    />
+                                    <Chip
+                                        label='Revise su correo para validar su cuenta'
+                                        color='success'
+                                        icon={<InfoOutlined />}
+                                        className='fadeIn'
+                                        sx={{
+                                            display: message ? 'flex' : 'none',
+                                        }}
+                                    />
+                                </>
+                            )}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -121,10 +128,6 @@ const RegisterPage = () => {
                                 fullWidth
                                 {...register('firstName', {
                                     required: 'Este campo es requerido',
-                                    minLength: {
-                                        value: 2,
-                                        message: 'Mínimo 2 caracteres',
-                                    },
                                 })}
                                 error={!!errors.firstName}
                                 helperText={errors.firstName?.message}
@@ -137,10 +140,6 @@ const RegisterPage = () => {
                                 fullWidth
                                 {...register('lastName', {
                                     required: 'Este campo es requerido',
-                                    minLength: {
-                                        value: 2,
-                                        message: 'Mínimo 2 caracteres',
-                                    },
                                 })}
                                 error={!!errors.lastName}
                                 helperText={errors.lastName?.message}
@@ -148,15 +147,11 @@ const RegisterPage = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                label='Usuario (alias)'
+                                label='Usuario'
                                 variant='filled'
                                 fullWidth
                                 {...register('username', {
                                     required: 'Este campo es requerido',
-                                    minLength: {
-                                        value: 2,
-                                        message: 'Mínimo 2 caracteres',
-                                    },
                                 })}
                                 error={!!errors.username}
                                 helperText={errors.username?.message}
@@ -170,7 +165,7 @@ const RegisterPage = () => {
                                 fullWidth
                                 {...register('email', {
                                     required: 'Este campo es requerido',
-                                    validate: validations.isEmail,
+                                    validate: validators.isEmail,
                                 })}
                                 error={!!errors.email}
                                 helperText={errors.email?.message}
@@ -192,7 +187,7 @@ const RegisterPage = () => {
                                         value: 16,
                                         message: 'Máximo 16 caracteres',
                                     },
-                                    validate: validations.isPassword,
+                                    validate: validators.isPassword,
                                 })}
                                 error={!!errors.password}
                                 helperText={errors.password?.message}
@@ -207,10 +202,6 @@ const RegisterPage = () => {
                                 select
                                 {...register('company', {
                                     required: 'Este campo es requerido',
-                                    minLength: {
-                                        value: 6,
-                                        message: 'Mínimo 6 caracteres',
-                                    },
                                 })}
                                 error={!!errors.company}
                                 helperText={errors.company?.message}
@@ -223,32 +214,26 @@ const RegisterPage = () => {
                             </TextField>
                         </Grid>
                         <Grid item xs={12}>
-                            {isLoading ? (
-                                <CircularProgress />
-                            ) : (
-                                <Button
-                                    type='submit'
-                                    color='secondary'
-                                    className='circular-btn'
-                                    size='large'
-                                    fullWidth
-                                >
-                                    Crear cuenta
-                                </Button>
-                            )}
+                            <Button
+                                type='submit'
+                                color='secondary'
+                                className='circular-btn'
+                                size='large'
+                                fullWidth
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <CircleOutlined />
+                                ) : (
+                                    'Registrar usuario'
+                                )}
+                            </Button>
                         </Grid>
                         <Grid item xs={12} display='flex' justifyContent='end'>
-                            <NextLink
-                                href={
-                                    router.query.p && router.query.p !== '/'
-                                        ? `/auth/login?p=${router.query.p.toString()}`
-                                        : '/auth/login'
-                                }
-                                passHref
-                                legacyBehavior
-                            >
-                                <Link underline='none'>¿Ya tienes cuenta?</Link>
-                            </NextLink>
+                            <Link href='/auth/login'>Iniciar sesión</Link>
+                        </Grid>
+                        <Grid item xs={12} display='flex' justifyContent='end'>
+                            <Link href='/auth/register'>Recuperar clave</Link>
                         </Grid>
                     </Grid>
                 </Box>
@@ -256,5 +241,3 @@ const RegisterPage = () => {
         </AuthLayout>
     );
 };
-
-export default RegisterPage;

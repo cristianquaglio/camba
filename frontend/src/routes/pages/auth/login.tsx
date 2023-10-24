@@ -1,58 +1,54 @@
-import { useEffect, useState } from 'react';
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import NextLink from 'next/link';
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     Box,
     Button,
     Chip,
-    Divider,
     Grid,
     Link,
     TextField,
     Typography,
 } from '@mui/material';
-import { ErrorOutline } from '@mui/icons-material';
+import { CircleOutlined, ErrorOutline } from '@mui/icons-material';
+import { useForm } from 'react-hook-form';
 
-import { AuthLayout } from '../../components/layouts';
-import { validations } from '../../utils';
+import { AuthLayout } from '../../../components/layouts';
+import { validators } from '../../../utils';
+import { login } from '../../../slices/authSlice';
+import { AppDispatch, RootState } from '../../../store/store';
 
-type FormData = {
-    email: string;
-    password: string;
-};
+export const LoginPage = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+    const { hasError, isLoggedIn, isLoading } = useSelector(
+        (state: RootState) => state.auth,
+    );
 
-const LoginPage = () => {
-    const router = useRouter();
+    type formData = {
+        email: string;
+        password: string;
+    };
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<FormData>();
+    } = useForm<formData>();
 
-    const [showError, setShowError] = useState(false);
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/');
+        }
+    }, [navigate, isLoggedIn]);
 
-    const onLoginUser = async ({ email, password }: FormData) => {
-        setShowError(false);
-        // const isValidLogin = await loginUser(email, password);
-        // if (!isValidLogin) {
-        //     setShowError(true);
-        //     setTimeout(() => {
-        //         setShowError(false);
-        //     }, 3000);
-        //     return;
-        // }
-
-        // const destination = router.query.p?.toString() || '/';
-        // router.replace(destination);
-        console.log({ email, password });
+    const onLogin = ({ email, password }: formData) => {
+        dispatch(login({ email, password }));
     };
 
     return (
-        <AuthLayout title='Iniciar sesión'>
-            <form onSubmit={handleSubmit(onLoginUser)} noValidate>
+        <AuthLayout>
+            <form onSubmit={handleSubmit(onLogin)} noValidate>
                 <Box sx={{ width: 350, padding: '10px 20px' }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -65,7 +61,7 @@ const LoginPage = () => {
                                 color='error'
                                 icon={<ErrorOutline />}
                                 className='fadeIn'
-                                sx={{ display: showError ? 'flex' : 'none' }}
+                                sx={{ display: hasError ? 'flex' : 'none' }}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -76,7 +72,7 @@ const LoginPage = () => {
                                 fullWidth
                                 {...register('email', {
                                     required: 'Este campo es requerido',
-                                    validate: validations.isEmail,
+                                    validate: validators.isEmail,
                                 })}
                                 error={!!errors.email}
                                 helperText={errors.email?.message}
@@ -98,47 +94,34 @@ const LoginPage = () => {
                                         value: 16,
                                         message: 'Máximo 16 caracteres',
                                     },
-                                    validate: validations.isPassword,
+                                    validate: validators.isPassword,
                                 })}
                                 error={!!errors.password}
                                 helperText={errors.password?.message}
                             />
                         </Grid>
                         <Grid item xs={12}>
+                            {}
                             <Button
                                 type='submit'
                                 color='secondary'
                                 className='circular-btn'
                                 size='large'
                                 fullWidth
+                                disabled={isLoading}
                             >
-                                Ingresar
+                                {isLoading ? (
+                                    <CircleOutlined />
+                                ) : (
+                                    'Iniciar sesión'
+                                )}
                             </Button>
                         </Grid>
                         <Grid item xs={12} display='flex' justifyContent='end'>
-                            <NextLink
-                                href={
-                                    router.query.p && router.query.p !== '/'
-                                        ? `/auth/register-admin?p=${router.query.p.toString()}`
-                                        : '/auth/register-admin'
-                                }
-                                passHref
-                                legacyBehavior
-                            >
-                                <Link underline='always'>
-                                    ¿No tienes cuenta?
-                                </Link>
-                            </NextLink>
+                            <Link href='/auth/register'>Registrarse</Link>
                         </Grid>
-
-                        <Grid
-                            item
-                            xs={12}
-                            display='flex'
-                            flexDirection='column'
-                            justifyContent='end'
-                        >
-                            <Divider sx={{ width: '100%', mb: 2 }} />
+                        <Grid item xs={12} display='flex' justifyContent='end'>
+                            <Link href='/auth/register'>Recuperar clave</Link>
                         </Grid>
                     </Grid>
                 </Box>
@@ -146,27 +129,3 @@ const LoginPage = () => {
         </AuthLayout>
     );
 };
-
-// export const getServerSideProps: GetServerSideProps = async ({
-//     req,
-//     query,
-// }) => {
-//     const session = await getSession({ req });
-
-//     const { p = '/' } = query;
-
-//     if (session) {
-//         return {
-//             redirect: {
-//                 destination: p.toString(),
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {},
-//     };
-// };
-
-export default LoginPage;
